@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/16 01:23:55 by sgardner          #+#    #+#             */
-/*   Updated: 2018/05/03 06:41:17 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/13 04:21:55 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 
 typedef int				t_bool;
 typedef unsigned char	t_byte;
+typedef unsigned int	t_uint;
 
 /*
 ** Reproduction of <ctype.h>
@@ -114,7 +115,7 @@ char	*ft_strnstr(const char *s1, const char *s2, size_t n);
 
 void	*ft_memalloc(size_t size);
 void	ft_memdel(void **ap);
-void	*ft_revbytes(void *ptr, size_t n);
+t_byte	*ft_revbytes(t_byte *ptr, size_t n);
 char	*ft_strcapitalize(char *str);
 void	ft_strclr(char *s);
 void	ft_strdel(char **as);

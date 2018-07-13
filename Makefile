@@ -15,7 +15,8 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 SRC = \
-	main
+	main\
+	md5
 
 OBJ = $(patsubst %, $(OBJ_DIR)/%.o, $(SRC))
 
@@ -37,7 +38,7 @@ all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
 	@printf "$(YELLOW)%-$(COLSIZE)s$(NC)" "Building $@... "
-	@$(CC) $(CFLAGS) $(OBJ) -o $@
+	@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@
 	@echo "$(GREEN)DONE$(NC)"
 
 $(LIBFT):
