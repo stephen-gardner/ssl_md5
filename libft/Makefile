@@ -7,7 +7,7 @@
 NAME = libft.a
 CC = gcc
 CFLAGS += -Wall -Werror -Wextra
-CFLAGS += -Ofast
+CFLAGS += -Ofast -funroll-loops
 CFLAGS += #-g -fsanitize=address
 INC = -I inc
 SRC_DIR = src

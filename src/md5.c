@@ -6,13 +6,11 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/13 17:54:59 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/14 09:08:49 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
-#include "ft_printf.h"
-#include <stdlib.h>
 
 static t_uint const	g_radians[64] = {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
@@ -52,36 +50,15 @@ static t_uint const	g_bindex[64] = {
 	0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9
 };
 
-char const			*md5tostr(t_md5ctx *ctx)
+void				md5_init(t_md5ctx *ctx)
 {
-	static char	str[32];
-	t_byte		*data;
-	int			i;
-
-	i = 0;
-	data = (t_byte *)ctx->state;
-	while (i < 16)
-	{
-		ft_sprintf(&str[(i << 1)], "%.2x", data[i]);
-		++i;
-	}
-	return (str);
-}
-
-static t_byte		*pad_msg(t_md5ctx *ctx, t_byte *msg, size_t len)
-{
-	t_byte		*padded;
-	uint64_t	nsize;
-
-	nsize = len + sizeof(uint64_t) + 1;
-	nsize += 64 - (nsize & 63);
-	padded = ft_memalloc(nsize);
-	ft_memcpy(padded, msg, len);
-	padded[len] = 0x80;
-	len <<= 3;
-	ft_memcpy(padded + nsize - sizeof(uint64_t), &len, sizeof(uint64_t));
-	ctx->count[1] = nsize >> 6;
-	return (padded);
+	ctx->state[0] = 0x67452301;
+	ctx->state[1] = 0xefcdab89;
+	ctx->state[2] = 0x98badcfe;
+	ctx->state[3] = 0x10325476;
+	ctx->count[0] = 0;
+	ctx->count[1] = 0;
+	ft_memset(ctx->buff, 0, 64);
 }
 
 #define F1(b, c, d)	(((b) & (c)) | (~(b) & (d)))
@@ -118,30 +95,60 @@ static t_uint		*process_chunk(t_md5ctx *ctx)
 	return (state);
 }
 
-t_md5ctx			*md5(t_byte *msg, size_t len)
+static void			update(t_md5ctx *ctx)
 {
-	static t_md5ctx	ctx;
-	t_byte const	*padded;
-	t_uint			*chunk_res;
-	uint32_t		i;
+	t_uint	*chunk_res;
 
-	i = 0;
-	ctx.state[0] = 0x67452301;
-	ctx.state[1] = 0xefcdab89;
-	ctx.state[2] = 0x98badcfe;
-	ctx.state[3] = 0x10325476;
-	ctx.count[0] = len;
-	padded = pad_msg(&ctx, msg, len);
-	while (i < ctx.count[1])
+	chunk_res = process_chunk(ctx);
+	ctx->state[0] += chunk_res[0];
+	ctx->state[1] += chunk_res[1];
+	ctx->state[2] += chunk_res[2];
+	ctx->state[3] += chunk_res[3];
+	ft_memset(ctx->buff, 0, 64);
+	ctx->count[0] = 0;
+}
+
+void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
+{
+	uint32_t		bytes;
+
+	while (len)
 	{
-		ft_memcpy(ctx.buff, padded + (i++ << 6), 64);
-		chunk_res = process_chunk(&ctx);
-		ctx.state[0] += chunk_res[0];
-		ctx.state[1] += chunk_res[1];
-		ctx.state[2] += chunk_res[2];
-		ctx.state[3] += chunk_res[3];
+		bytes = ctx->count[0] >> 3;
+		if (bytes + len < 64)
+		{
+			ft_memcpy((t_byte *)ctx->buff + bytes, msg, len);
+			ctx->count[0] += len << 3;
+			return ;
+		}
+		ft_memcpy((t_byte *)ctx->buff + bytes, msg, 64 - bytes);
+		++ctx->count[1];
+		update(ctx);
+		msg += 64 - bytes;
+		len -= 64 - bytes;
 	}
-	ft_memset(ctx.buff, 0, 64);
-	free((void *)padded);
-	return (&ctx);
+}
+
+void				md5_final(t_byte *digest, t_md5ctx *ctx)
+{
+	uint32_t	bytes;
+	size_t		total_size;
+	int			i;
+
+	bytes = ctx->count[0] >> 3;
+	((t_byte *)ctx->buff)[bytes] = 0x80;
+	if (bytes + sizeof(uint64_t) > 64)
+		update(ctx);
+	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
+	ft_memcpy(
+		(t_byte *)ctx->buff + (64 - sizeof(uint64_t)),
+		&total_size,
+		sizeof(uint64_t));
+	update(ctx);
+	i = 0;
+	while (i < 16)
+	{
+		digest[i] = ((t_byte *)ctx->state)[i];
+		++i;
+	}
 }
