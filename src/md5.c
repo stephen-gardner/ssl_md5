@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/14 09:08:49 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/14 12:37:21 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,6 @@ static void			update(t_md5ctx *ctx)
 	ctx->state[2] += chunk_res[2];
 	ctx->state[3] += chunk_res[3];
 	ft_memset(ctx->buff, 0, 64);
-	ctx->count[0] = 0;
 }
 
 void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
@@ -122,6 +121,7 @@ void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
 			return ;
 		}
 		ft_memcpy((t_byte *)ctx->buff + bytes, msg, 64 - bytes);
+		ctx->count[0] = 0;
 		++ctx->count[1];
 		update(ctx);
 		msg += 64 - bytes;

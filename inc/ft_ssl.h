@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/14 07:56:08 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/14 12:06:00 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ typedef struct	s_md5ctx
 ** md5.c
 */
 
-void			md5_final(t_byte *digest, t_md5ctx *ctx);
 void			md5_init(t_md5ctx *ctx);
 void			md5_update(t_md5ctx *ctx, t_byte *msg, size_t len);
+void			md5_final(t_byte *digest, t_md5ctx *ctx);
 #endif
