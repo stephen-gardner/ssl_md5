@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/13 08:33:28 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/13 17:54:59 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,8 @@ static t_byte		*pad_msg(t_md5ctx *ctx, t_byte *msg, size_t len)
 	padded = ft_memalloc(nsize);
 	ft_memcpy(padded, msg, len);
 	padded[len] = 0x80;
-	ft_memcpy(
-		padded + nsize - sizeof(uint64_t),
-		&ctx->count[0],
-		sizeof(uint64_t));
+	len <<= 3;
+	ft_memcpy(padded + nsize - sizeof(uint64_t), &len, sizeof(uint64_t));
 	ctx->count[1] = nsize >> 6;
 	return (padded);
 }
@@ -132,7 +130,7 @@ t_md5ctx			*md5(t_byte *msg, size_t len)
 	ctx.state[1] = 0xefcdab89;
 	ctx.state[2] = 0x98badcfe;
 	ctx.state[3] = 0x10325476;
-	ctx.count[0] = len << 3;
+	ctx.count[0] = len;
 	padded = pad_msg(&ctx, msg, len);
 	while (i < ctx.count[1])
 	{
@@ -143,6 +141,7 @@ t_md5ctx			*md5(t_byte *msg, size_t len)
 		ctx.state[2] += chunk_res[2];
 		ctx.state[3] += chunk_res[3];
 	}
+	ft_memset(ctx.buff, 0, 64);
 	free((void *)padded);
 	return (&ctx);
 }
