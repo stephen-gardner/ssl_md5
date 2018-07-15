@@ -6,13 +6,13 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/14 12:37:21 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 04:39:08 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-static t_uint const	g_radians[64] = {
+static uint32_t const	g_radians[64] = {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 	0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -36,14 +36,14 @@ static t_uint const	g_radians[64] = {
 #define S3			4, 11, 16, 23
 #define S4			6, 10, 15, 21
 
-static t_uint const	g_shifts[64] = {
+static uint32_t const	g_shifts[64] = {
 	S1, S1, S1, S1,
 	S2, S2, S2, S2,
 	S3, S3, S3, S3,
 	S4, S4, S4, S4
 };
 
-static t_uint const	g_bindex[64] = {
+static uint32_t const	g_bindex[64] = {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	1, 6, 11, 0, 5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12,
 	5, 8, 11, 14, 1, 4, 7, 10, 13, 0, 3, 6, 9, 12, 15, 2,
@@ -58,19 +58,17 @@ void				md5_init(t_md5ctx *ctx)
 	ctx->state[3] = 0x10325476;
 	ctx->count[0] = 0;
 	ctx->count[1] = 0;
-	ft_memset(ctx->buff, 0, 64);
 }
 
 #define F1(b, c, d)	(((b) & (c)) | (~(b) & (d)))
 #define F2(b, c, d)	(((b) & (d)) | ((c) & ~(d)))
 #define F3(b, c, d)	((b) ^ (c) ^ (d))
 #define F4(b, c, d)	((c) ^ ((b) | ~(d)))
-#define ROTL(x, c)	(((x) << (c)) | ((x) >> (32 - c)))
 
-static t_uint		*process_chunk(t_md5ctx *ctx)
+static uint32_t		*process_chunk(t_md5ctx *ctx)
 {
-	static t_uint	state[4];
-	t_uint			f;
+	static uint32_t	state[4];
+	uint32_t		f;
 	int				i;
 
 	i = 0;
@@ -85,7 +83,7 @@ static t_uint		*process_chunk(t_md5ctx *ctx)
 			f = F3(state[1], state[2], state[3]);
 		else
 			f = F4(state[1], state[2], state[3]);
-		f += state[0] + g_radians[i] + ctx->buff[g_bindex[i]];
+		f += state[0] + g_radians[i] + ((uint32_t *)ctx->buff)[g_bindex[i]];
 		state[0] = state[3];
 		state[3] = state[2];
 		state[2] = state[1];
@@ -97,14 +95,13 @@ static t_uint		*process_chunk(t_md5ctx *ctx)
 
 static void			update(t_md5ctx *ctx)
 {
-	t_uint	*chunk_res;
+	uint32_t	*chunk_res;
 
 	chunk_res = process_chunk(ctx);
 	ctx->state[0] += chunk_res[0];
 	ctx->state[1] += chunk_res[1];
 	ctx->state[2] += chunk_res[2];
 	ctx->state[3] += chunk_res[3];
-	ft_memset(ctx->buff, 0, 64);
 }
 
 void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
@@ -116,11 +113,11 @@ void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
 		bytes = ctx->count[0] >> 3;
 		if (bytes + len < 64)
 		{
-			ft_memcpy((t_byte *)ctx->buff + bytes, msg, len);
+			ft_memcpy(ctx->buff + bytes, msg, len);
 			ctx->count[0] += len << 3;
 			return ;
 		}
-		ft_memcpy((t_byte *)ctx->buff + bytes, msg, 64 - bytes);
+		ft_memcpy(ctx->buff + bytes, msg, 64 - bytes);
 		ctx->count[0] = 0;
 		++ctx->count[1];
 		update(ctx);
@@ -132,16 +129,20 @@ void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
 void				md5_final(t_byte *digest, t_md5ctx *ctx)
 {
 	uint32_t	bytes;
-	size_t		total_size;
+	uint64_t	total_size;
 	int			i;
 
 	bytes = ctx->count[0] >> 3;
-	((t_byte *)ctx->buff)[bytes] = 0x80;
+	ctx->buff[bytes] = 0x80;
+	ft_memset(ctx->buff + bytes + 1, 0, 63 - bytes);
 	if (bytes + sizeof(uint64_t) > 64)
+	{
 		update(ctx);
+		ft_memset(ctx->buff, 0, 64 - sizeof(uint64_t));
+	}
 	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
 	ft_memcpy(
-		(t_byte *)ctx->buff + (64 - sizeof(uint64_t)),
+		ctx->buff + (64 - sizeof(uint64_t)),
 		&total_size,
 		sizeof(uint64_t));
 	update(ctx);

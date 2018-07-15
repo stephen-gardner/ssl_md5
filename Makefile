@@ -7,8 +7,8 @@
 NAME = ft_ssl
 CC = gcc
 CFLAGS += -Wall -Werror -Wextra
-CFLAGS += #-Ofast -funroll-loops
-CFLAGS += -g -fsanitize=address
+CFLAGS += -Ofast -funroll-loops
+CFLAGS += #-g -fsanitize=address
 INC = -I inc -I libft/inc
 LIBFT = libft/libft.a
 SRC_DIR = src
@@ -17,7 +17,8 @@ OBJ_DIR = obj
 SRC = \
 	main\
 	md5\
-	sha256
+	sha256\
+	util
 
 OBJ = $(patsubst %, $(OBJ_DIR)/%.o, $(SRC))
 
