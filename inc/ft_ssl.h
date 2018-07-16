@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 05:53:32 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 07:30:57 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void			sha256_final(t_byte *digest, t_sha256ctx *ctx);
 
 void			rev_endian32(uint32_t *tab, int len);
 void			rev_endian64(uint64_t *tab, int len);
-int				usage(void);
+void			usage(void);
 
 extern char const	*g_pname;
 #endif

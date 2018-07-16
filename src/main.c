@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:17:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 06:14:17 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 07:30:49 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char const		*g_pname;
 
 void			print_hash(t_ssl *ssl, t_byte const *digest)
 {
-	char	hash[64];
+	char	hash[65];
 	int		len;
 	int		i;
 
@@ -43,6 +43,34 @@ void			print_hash(t_ssl *ssl, t_byte const *digest)
 		ft_printf("%s\n", hash);
 }
 
+static t_bool	process_flags(int ac, char *const av[], t_ssl *ssl)
+{
+	char	f;
+	t_bool	hashed;
+
+	hashed = FALSE;
+	while ((f = ft_getopt(ac, av, "pqrs:")) != -1)
+	{
+		if (f == 'q')
+			ssl->quiet = TRUE;
+		else if (f == 'r')
+			ssl->reverse = TRUE;
+		else if (f == 'p')
+		{
+			hash_file(ssl, NULL);
+			hashed = TRUE;
+		}
+		else if (f == 's')
+		{
+			hash_string(ssl, g_optarg);
+			hashed = TRUE;
+		}
+		else
+			usage();
+	}
+	return (hashed);
+}
+
 static t_bool	set_mode(int ac, char *av[], t_ssl *ssl)
 {
 	if (ac < 2)
@@ -61,24 +89,14 @@ static t_bool	set_mode(int ac, char *av[], t_ssl *ssl)
 int				main(int ac, char *av[])
 {
 	static t_ssl	ssl;
-	char			f;
+	t_bool			hashed;
 
 	g_pname = av[0];
 	if (!set_mode(ac--, av, &ssl))
-		return (usage());
-	while ((f = ft_getopt(ac, av, "pqrs:")) != -1)
-	{
-		if (f == 'q')
-			ssl.quiet = TRUE;
-		else if (f == 'r')
-			ssl.reverse = TRUE;
-		else if (f == 'p')
-			hash_file(&ssl, NULL);
-		else if (f == 's')
-			hash_string(&ssl, g_optarg);
-		else
-			return (usage());
-	}
+		usage();
+	hashed = process_flags(ac, av, &ssl);
+	if (!hashed && g_optind == ac)
+		hash_file(&ssl, NULL);
 	while (g_optind < ac)
 		hash_file(&ssl, av[g_optind++]);
 	return (0);
