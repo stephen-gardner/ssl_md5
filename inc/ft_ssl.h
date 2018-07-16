@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 04:38:01 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 23:36:05 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,27 @@ typedef struct	s_sha256ctx
 	t_byte		buff[256];
 }				t_sha256ctx;
 
+typedef union	u_ctx
+{
+	t_md5ctx	md5;
+	t_sha256ctx	sha256;
+}				t_ctx;
+
+enum			e_hash
+{
+	UNDEFINED,
+	MD5,
+	SHA256
+};
+
+typedef struct	s_ssl
+{
+	t_ctx		ctx;
+	int			hash_type;
+	t_bool		quiet;
+	t_bool		reverse;
+}				t_ssl;
+
 /*
 ** md5.c
 */
@@ -54,4 +75,5 @@ void			sha256_final(t_byte *digest, t_sha256ctx *ctx);
 
 void			rev_endian32(uint32_t *tab, int len);
 void			rev_endian64(uint64_t *tab, int len);
+int				usage(void);
 #endif

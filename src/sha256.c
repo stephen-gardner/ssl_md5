@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/13 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 04:47:25 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 23:07:33 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static uint32_t const	g_primecr[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-void				sha256_init(t_sha256ctx *ctx)
+void					sha256_init(t_sha256ctx *ctx)
 {
 	ctx->state[0] = 0x6a09e667;
 	ctx->state[1] = 0xbb67ae85;
@@ -50,7 +50,7 @@ void				sha256_init(t_sha256ctx *ctx)
 #define BSIG0(a)		(ROTR(a, 2) ^ ROTR(a, 13) ^ ROTR(a, 22))
 #define BSIG1(e)		(ROTR(e, 6) ^ ROTR(e, 11) ^ ROTR(e, 25))
 
-static uint32_t		*process_chunk(t_sha256ctx *ctx)
+static uint32_t			*process_chunk(t_sha256ctx *ctx)
 {
 	static uint32_t	state[8];
 	uint32_t		tmp1;
@@ -80,11 +80,11 @@ static uint32_t		*process_chunk(t_sha256ctx *ctx)
 #define SSIG0(x)		(ROTR(x, 7) ^ ROTR(x, 18) ^ (x >> 3))
 #define SSIG1(x)		(ROTR(x, 17) ^ ROTR(x, 19) ^ (x >> 10))
 
-static void			update(t_sha256ctx *ctx)
+static void				update(t_sha256ctx *ctx)
 {
-	uint32_t		*chunk_res;
-	uint32_t		*buff;
-	int				i;
+	uint32_t	*chunk_res;
+	uint32_t	*buff;
+	int			i;
 
 	i = 16;
 	buff = (uint32_t *)ctx->buff;
@@ -106,9 +106,9 @@ static void			update(t_sha256ctx *ctx)
 	ctx->state[7] += chunk_res[7];
 }
 
-void				sha256_update(t_sha256ctx *ctx, t_byte *msg, size_t len)
+void					sha256_update(t_sha256ctx *ctx, t_byte *msg, size_t len)
 {
-	uint32_t		bytes;
+	uint32_t	bytes;
 
 	while (len)
 	{
@@ -128,7 +128,7 @@ void				sha256_update(t_sha256ctx *ctx, t_byte *msg, size_t len)
 	}
 }
 
-void				sha256_final(t_byte *digest, t_sha256ctx *ctx)
+void					sha256_final(t_byte *digest, t_sha256ctx *ctx)
 {
 	uint32_t	bytes;
 	uint64_t	total_size;

@@ -6,67 +6,81 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:17:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 04:41:40 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 23:37:03 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
+#include "ft_getopt.h"
 #include "ft_printf.h"
-
-#include <fcntl.h>
 #include <unistd.h>
-/*
-int	main(int ac, char *av[])
+
+static void	print_result(t_ssl *ssl, t_byte const *digest)
 {
-	t_md5ctx	ctx;
-	t_byte		digest[16];
-	char		hash[32];
+	char	hash[64];
+	int		len;
+	int		i;
+
+	i = 0;
+	len = (ssl->hash_type == MD5) ? 16 : 32;
+	while (i < len)
+	{
+		ft_sprintf(hash + (i << 1), "%.2x", digest[i]);
+		++i;
+	}
+	ft_printf("%s\n", hash);
+}
+
+static void	hash_stdin(t_ssl *ssl)
+{
+	static t_byte	buff[4096];
+	t_byte			digest[32];
+	int				bytes;
+
+	if (ssl->hash_type == MD5)
+		md5_init(&ssl->ctx.md5);
+	else
+		sha256_init(&ssl->ctx.sha256);
+	while ((bytes = read(STDIN_FILENO, buff, 4096)) > 0)
+	{
+		if (ssl->hash_type == MD5)
+			md5_update(&ssl->ctx.md5, buff, bytes);
+		else
+			sha256_update(&ssl->ctx.sha256, buff, bytes);
+	}
+	if (ssl->hash_type == MD5)
+		md5_final(digest, &ssl->ctx.md5);
+	else
+		sha256_final(digest, &ssl->ctx.sha256);
+	print_result(ssl, digest);
+}
+
+int			main(int ac, char *av[])
+{
+	static t_ssl	ssl;
+	char			f;
 
 	if (ac < 2)
-		return (1);
-	md5_init(&ctx);
-	md5_update(&ctx, (t_byte *)av[1], LEN(av[1]));
-	md5_final(digest, &ctx);
-int fd = open(av[1], O_RDONLY);
-t_byte	buff[4097];
-int bytes = 0;
-while ((bytes = read(fd, buff, 4096)) > 0)
-{
-	buff[bytes] = 0;
-	md5_update(&ctx, buff, bytes);
-}
-close(fd);
-md5_final(digest, &ctx);
-	for (int i = 0; i < 16; i++)
-		ft_sprintf(hash + (i << 1), "%.2x", digest[i]);
-	ft_printf("%s\n", hash);
-	return (0);
-}*/
-
-
-int	main(int ac, char *av[])
-{
-	t_sha256ctx	ctx;
-	t_byte		digest[32];
-	char		hash[64];
-
-	if (ac < 2)
-		return (1);
-	sha256_init(&ctx);
-/*	md5_update(&ctx, (t_byte *)av[1], LEN(av[1]));
-	md5_final(digest, &ctx);*/
-int fd = open(av[1], O_RDONLY);
-t_byte	buff[4097];
-int bytes = 0;
-while ((bytes = read(fd, buff, 4096)) > 0)
-{
-	buff[bytes] = 0;
-	sha256_update(&ctx, buff, bytes);
-}
-close(fd);
-sha256_final(digest, &ctx);
-	for (int i = 0; i < 32; i++)
-		ft_sprintf(hash + (i << 1), "%.2x", digest[i]);
-	ft_printf("%s\n", hash);
+		return (usage());
+	ft_strlowcase(av[1]);
+	if (!strcmp("md5", av[1]))
+		ssl.hash_type = MD5;
+	else if (!strcmp("sha256", av[1]))
+		ssl.hash_type = SHA256;
+	else
+		return (usage());
+	ft_memcpy(&av[1], &av[ac - 1], sizeof(char *) * (ac - 1));
+	--ac;
+	while ((f = ft_getopt(ac, av, "pqrs:")) != -1)
+	{
+		if (f == 'q')
+			ssl.quiet = TRUE;
+		else if (f == 'r')
+			ssl.reverse = TRUE;
+		else if (f == 'p')
+			hash_stdin(&ssl);
+		else if (f == 's')
+			;
+	}
 	return (0);
 }

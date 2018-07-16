@@ -17,11 +17,13 @@ SRC = \
 	ft_memalloc\
 	ft_memcpy\
 	ft_memset\
+	ft_stpcpy\
 	ft_stpncpy\
 	ft_strchr\
 	ft_strcmp\
 	ft_strdup\
 	ft_strlen\
+	ft_strlowcase\
 	ft_strnlen\
 	ft_strupcase
 

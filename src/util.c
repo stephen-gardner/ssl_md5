@@ -6,11 +6,13 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/15 04:03:42 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 04:49:17 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 23:36:40 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
+#include "ft_printf.h"
+#include <unistd.h>
 
 void	rev_endian32(uint32_t *tab, int len)
 {
@@ -50,4 +52,10 @@ void	rev_endian64(uint64_t *tab, int len)
 		data[6] = ((n >> 8) & 0xff);
 		data[7] = (n & 0xff);
 	}
+}
+
+int		usage(void)
+{
+	ft_dprintf(STDERR_FILENO, "Usage\n");
+	return (1);
 }

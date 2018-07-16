@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 04:39:08 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/15 23:07:30 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static uint32_t const	g_bindex[64] = {
 	0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9
 };
 
-void				md5_init(t_md5ctx *ctx)
+void					md5_init(t_md5ctx *ctx)
 {
 	ctx->state[0] = 0x67452301;
 	ctx->state[1] = 0xefcdab89;
@@ -65,7 +65,7 @@ void				md5_init(t_md5ctx *ctx)
 #define F3(b, c, d)	((b) ^ (c) ^ (d))
 #define F4(b, c, d)	((c) ^ ((b) | ~(d)))
 
-static uint32_t		*process_chunk(t_md5ctx *ctx)
+static uint32_t			*process_chunk(t_md5ctx *ctx)
 {
 	static uint32_t	state[4];
 	uint32_t		f;
@@ -93,7 +93,7 @@ static uint32_t		*process_chunk(t_md5ctx *ctx)
 	return (state);
 }
 
-static void			update(t_md5ctx *ctx)
+static void				update(t_md5ctx *ctx)
 {
 	uint32_t	*chunk_res;
 
@@ -104,9 +104,9 @@ static void			update(t_md5ctx *ctx)
 	ctx->state[3] += chunk_res[3];
 }
 
-void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
+void					md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
 {
-	uint32_t		bytes;
+	uint32_t	bytes;
 
 	while (len)
 	{
@@ -126,7 +126,7 @@ void				md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
 	}
 }
 
-void				md5_final(t_byte *digest, t_md5ctx *ctx)
+void					md5_final(t_byte *digest, t_md5ctx *ctx)
 {
 	uint32_t	bytes;
 	uint64_t	total_size;
@@ -141,9 +141,7 @@ void				md5_final(t_byte *digest, t_md5ctx *ctx)
 		ft_memset(ctx->buff, 0, 64 - sizeof(uint64_t));
 	}
 	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
-	ft_memcpy(
-		ctx->buff + (64 - sizeof(uint64_t)),
-		&total_size,
+	ft_memcpy(ctx->buff + (64 - sizeof(uint64_t)), &total_size,
 		sizeof(uint64_t));
 	update(ctx);
 	i = 0;
