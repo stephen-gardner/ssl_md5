@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/16 04:29:26 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 05:58:39 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 08:37:23 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void		hash_file(t_ssl *ssl, char const *filename)
 	if (fd)
 		close(fd);
 	final(ssl, digest);
-	print_hash(ssl, digest);
+	print_hash(ssl, digest, FALSE);
 }
 
 void		hash_string(t_ssl *ssl, char const *arg)
@@ -75,5 +75,5 @@ void		hash_string(t_ssl *ssl, char const *arg)
 	init(ssl);
 	update(ssl, (t_byte const *)arg, LEN(arg));
 	final(ssl, digest);
-	print_hash(ssl, digest);
+	print_hash(ssl, digest, TRUE);
 }

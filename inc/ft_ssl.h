@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 07:30:57 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 08:37:12 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void			hash_string(t_ssl *ssl, char const *arg);
 ** main.c
 */
 
-void			print_hash(t_ssl *ssl, t_byte const *digest);
+void			print_hash(t_ssl *ssl, t_byte const *digest, t_bool quote);
 
 /*
 ** md5.c
