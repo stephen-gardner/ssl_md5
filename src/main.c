@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/09 18:17:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 06:05:35 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 06:14:17 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,5 +79,7 @@ int				main(int ac, char *av[])
 		else
 			return (usage());
 	}
+	while (g_optind < ac)
+		hash_file(&ssl, av[g_optind++]);
 	return (0);
 }
