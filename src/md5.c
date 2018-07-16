@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 05:12:55 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 09:13:58 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ static void				update(t_md5ctx *ctx)
 	ctx->state[1] += chunk_res[1];
 	ctx->state[2] += chunk_res[2];
 	ctx->state[3] += chunk_res[3];
+	ft_memset(ctx->buff, 0, 64);
 }
 
 void					md5_update(t_md5ctx *ctx, t_byte const *msg, size_t len)
@@ -134,12 +135,8 @@ void					md5_final(t_byte *digest, t_md5ctx *ctx)
 
 	bytes = ctx->count[0] >> 3;
 	ctx->buff[bytes] = 0x80;
-	ft_memset(ctx->buff + bytes + 1, 0, 63 - bytes);
 	if (bytes + sizeof(uint64_t) > 64)
-	{
 		update(ctx);
-		ft_memset(ctx->buff, 0, 64 - sizeof(uint64_t));
-	}
 	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
 	ft_memcpy(ctx->buff + (64 - sizeof(uint64_t)), &total_size,
 		sizeof(uint64_t));

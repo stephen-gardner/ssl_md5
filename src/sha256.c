@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/13 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 05:12:45 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 09:17:34 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ static void				update(t_sha256ctx *ctx)
 	ctx->state[5] += chunk_res[5];
 	ctx->state[6] += chunk_res[6];
 	ctx->state[7] += chunk_res[7];
+	ft_memset(ctx->buff, 0, 64);
 }
 
 void					sha256_update(t_sha256ctx *ctx, t_byte const *msg,
@@ -137,12 +138,8 @@ void					sha256_final(t_byte *digest, t_sha256ctx *ctx)
 
 	bytes = ctx->count[0] >> 3;
 	ctx->buff[bytes] = 0x80;
-	ft_memset(ctx->buff + bytes + 1, 0, 63 - bytes);
 	if (bytes + sizeof(uint64_t) > 64)
-	{
 		update(ctx);
-		ft_memset(ctx->buff, 0, 64 - sizeof(uint64_t));
-	}
 	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
 	rev_endian64(&total_size, 1);
 	ft_memcpy(ctx->buff + (64 - sizeof(uint64_t)), &total_size,
