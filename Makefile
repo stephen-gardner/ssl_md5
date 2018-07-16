@@ -15,6 +15,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 SRC = \
+	hash\
 	main\
 	md5\
 	sha256\

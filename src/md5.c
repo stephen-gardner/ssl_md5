@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 23:07:30 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 05:12:55 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ static void				update(t_md5ctx *ctx)
 	ctx->state[3] += chunk_res[3];
 }
 
-void					md5_update(t_md5ctx *ctx, t_byte *msg, size_t len)
+void					md5_update(t_md5ctx *ctx, t_byte const *msg, size_t len)
 {
 	uint32_t	bytes;
 

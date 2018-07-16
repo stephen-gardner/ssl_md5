@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/13 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/15 23:07:33 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/16 05:12:45 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,8 @@ static void				update(t_sha256ctx *ctx)
 	ctx->state[7] += chunk_res[7];
 }
 
-void					sha256_update(t_sha256ctx *ctx, t_byte *msg, size_t len)
+void					sha256_update(t_sha256ctx *ctx, t_byte const *msg,
+							size_t len)
 {
 	uint32_t	bytes;
 
