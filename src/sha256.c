@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/13 18:33:28 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 09:17:34 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/17 18:45:54 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,11 @@ static uint32_t const	g_primecr[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-void					sha256_init(t_sha256ctx *ctx)
+void					sha256_init(t_ssl *ssl)
 {
+	t_sha256ctx	*ctx;
+
+	ctx = &ssl->ctx.sha256;
 	ctx->state[0] = 0x6a09e667;
 	ctx->state[1] = 0xbb67ae85;
 	ctx->state[2] = 0x3c6ef372;
@@ -107,11 +110,12 @@ static void				update(t_sha256ctx *ctx)
 	ft_memset(ctx->buff, 0, 64);
 }
 
-void					sha256_update(t_sha256ctx *ctx, t_byte const *msg,
-							size_t len)
+void					sha256_update(t_ssl *ssl, t_byte const *msg, size_t len)
 {
+	t_sha256ctx	*ctx;
 	uint32_t	bytes;
 
+	ctx = &ssl->ctx.sha256;
 	while (len)
 	{
 		bytes = ctx->count[0] >> 3;
@@ -130,12 +134,14 @@ void					sha256_update(t_sha256ctx *ctx, t_byte const *msg,
 	}
 }
 
-void					sha256_final(t_byte *digest, t_sha256ctx *ctx)
+void					sha256_final(t_ssl *ssl, t_byte *digest)
 {
+	t_sha256ctx	*ctx;
 	uint32_t	bytes;
 	uint64_t	total_size;
 	int			i;
 
+	ctx = &ssl->ctx.sha256;
 	bytes = ctx->count[0] >> 3;
 	ctx->buff[bytes] = 0x80;
 	if (bytes + sizeof(uint64_t) > 64)

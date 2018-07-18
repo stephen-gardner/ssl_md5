@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/16 04:29:26 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 08:37:23 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/17 19:47:00 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,36 +16,46 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-static void	init(t_ssl *ssl)
+t_digest const	g_digests[] = {
+	{ MD5, md5_init, md5_update, md5_final, "MD5", 16 },
+	{ SHA256, sha256_init, sha256_update, sha256_final, "SHA256", 32 }
+};
+
+int const		g_digests_size = sizeof(g_digests) / sizeof(t_digest);
+
+static void		print_hash(t_ssl *ssl, t_byte const *digest, t_bool quote)
 {
-	if (ssl->hash_type == MD5)
-		md5_init(&ssl->ctx.md5);
-	else if (ssl->hash_type == SHA256)
-		sha256_init(&ssl->ctx.sha256);
+	t_digest const	*alg;
+	char			hash[65];
+	int				i;
+
+	i = 0;
+	alg = &g_digests[ssl->hash_type - 1];
+	while (i < alg->bsize)
+	{
+		ft_sprintf(hash + (i << 1), "%.2x", digest[i]);
+		++i;
+	}
+	if (ssl->arg && !ssl->quiet)
+	{
+		if (ssl->reverse)
+			ft_printf((quote) ? "%s \"%s\"\n" : "%s %s\n", hash, ssl->arg);
+		else if (quote)
+			ft_printf("%s (\"%s\") = %s\n", alg->name, ssl->arg, hash);
+		else
+			ft_printf("%s (%s) = %s\n", alg->name, ssl->arg, hash);
+	}
+	else
+		ft_printf("%s\n", hash);
 }
 
-static void	update(t_ssl *ssl, t_byte const *buff, size_t len)
+void			hash_file(t_ssl *ssl, char const *filename)
 {
-	if (ssl->hash_type == MD5)
-		md5_update(&ssl->ctx.md5, buff, len);
-	else if (ssl->hash_type == SHA256)
-		sha256_update(&ssl->ctx.sha256, buff, len);
-}
-
-static void	final(t_ssl *ssl, t_byte *digest)
-{
-	if (ssl->hash_type == MD5)
-		md5_final(digest, &ssl->ctx.md5);
-	else if (ssl->hash_type == SHA256)
-		sha256_final(digest, &ssl->ctx.sha256);
-}
-
-void		hash_file(t_ssl *ssl, char const *filename)
-{
-	t_byte	buff[4096];
-	t_byte	digest[32];
-	int		bytes;
-	int		fd;
+	t_digest const	*alg;
+	t_byte			buff[4096];
+	t_byte			digest[32];
+	int				bytes;
+	int				fd;
 
 	if (!(ssl->arg = filename))
 		fd = 0;
@@ -54,26 +64,29 @@ void		hash_file(t_ssl *ssl, char const *filename)
 		ft_printf("%s: %s: %s\n", g_pname, filename, strerror(errno));
 		return ;
 	}
-	init(ssl);
+	alg = &g_digests[ssl->hash_type - 1];
+	alg->init(ssl);
 	while ((bytes = read(fd, buff, 4096)) > 0)
 	{
-		update(ssl, buff, bytes);
+		alg->update(ssl, buff, bytes);
 		if (fd == STDIN_FILENO)
 			write(STDOUT_FILENO, buff, bytes);
 	}
 	if (fd)
 		close(fd);
-	final(ssl, digest);
+	alg->final(ssl, digest);
 	print_hash(ssl, digest, FALSE);
 }
 
-void		hash_string(t_ssl *ssl, char const *arg)
+void			hash_string(t_ssl *ssl, char const *arg)
 {
-	t_byte	digest[32];
+	t_digest const	*alg;
+	t_byte			digest[32];
 
+	alg = &g_digests[ssl->hash_type - 1];
 	ssl->arg = arg;
-	init(ssl);
-	update(ssl, (t_byte const *)arg, LEN(arg));
-	final(ssl, digest);
+	alg->init(ssl);
+	alg->update(ssl, (t_byte const *)arg, LEN(arg));
+	alg->final(ssl, digest);
 	print_hash(ssl, digest, TRUE);
 }

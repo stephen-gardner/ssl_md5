@@ -23,7 +23,6 @@ SRC = \
 	ft_strcmp\
 	ft_strdup\
 	ft_strlen\
-	ft_strlowcase\
 	ft_strnlen\
 	ft_strupcase
 

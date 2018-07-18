@@ -6,7 +6,7 @@
 /*   By: sgardner <stephenbgardner@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/11 00:29:32 by sgardner          #+#    #+#             */
-/*   Updated: 2018/07/16 09:13:58 by sgardner         ###   ########.fr       */
+/*   Updated: 2018/07/17 18:43:55 by sgardner         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,11 @@ static uint32_t const	g_bindex[64] = {
 	0, 7, 14, 5, 12, 3, 10, 1, 8, 15, 6, 13, 4, 11, 2, 9
 };
 
-void					md5_init(t_md5ctx *ctx)
+void					md5_init(t_ssl *ssl)
 {
+	t_md5ctx	*ctx;
+
+	ctx = &ssl->ctx.md5;
 	ctx->state[0] = 0x67452301;
 	ctx->state[1] = 0xefcdab89;
 	ctx->state[2] = 0x98badcfe;
@@ -105,10 +108,12 @@ static void				update(t_md5ctx *ctx)
 	ft_memset(ctx->buff, 0, 64);
 }
 
-void					md5_update(t_md5ctx *ctx, t_byte const *msg, size_t len)
+void					md5_update(t_ssl *ssl, t_byte const *msg, size_t len)
 {
+	t_md5ctx	*ctx;
 	uint32_t	bytes;
 
+	ctx = &ssl->ctx.md5;
 	while (len)
 	{
 		bytes = ctx->count[0] >> 3;
@@ -127,12 +132,14 @@ void					md5_update(t_md5ctx *ctx, t_byte const *msg, size_t len)
 	}
 }
 
-void					md5_final(t_byte *digest, t_md5ctx *ctx)
+void					md5_final(t_ssl *ssl, t_byte *digest)
 {
+	t_md5ctx	*ctx;
 	uint32_t	bytes;
 	uint64_t	total_size;
 	int			i;
 
+	ctx = &ssl->ctx.md5;
 	bytes = ctx->count[0] >> 3;
 	ctx->buff[bytes] = 0x80;
 	if (bytes + sizeof(uint64_t) > 64)
