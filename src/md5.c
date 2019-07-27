@@ -141,7 +141,7 @@ void					md5_final(t_ssl *ssl, t_byte *digest)
 
 	ctx = &ssl->ctx.md5;
 	bytes = ctx->count[0] >> 3;
-	ctx->buff[bytes] = 0x80;
+	ctx->buff[bytes++] = 0x80;
 	if (bytes + sizeof(uint64_t) > 64)
 		update(ctx);
 	total_size = ((size_t)ctx->count[1] << 9) + ctx->count[0];
